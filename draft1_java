@@ -1,0 +1,114 @@
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+
+import java.awt.Label;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+
+public class GuiPrototype extends JPanel implements ActionListener {
+	
+	JTextField thresholdValue;		//single line box for user to enter their preferred threshold value
+	JComboBox<String> organism;		//dropdown box containing organism names
+	JButton submit;					//submission button
+
+	private static final long serialVersionUID = -420254383943138649L;
+	
+	public GuiPrototype() {	//assn2ContentPane default constructor
+		JPanel windowContents = new JPanel(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		setPreferredSize(new Dimension(400, 150));	
+		
+		// ORGANISM COMBOBOX
+		c.gridx = 0;
+		c.gridy = 0;
+		c.anchor=GridBagConstraints.WEST;
+		windowContents.add(new Label("Select an Organism:  "), c);	//create a label for text area
+		organism = new JComboBox<String>();
+		organism.addItem("Campylobacter jejuni");
+		organism.addItem("Campylobacter concisus");
+		organism.addItem("Campylobacter something");
+		c.gridx = 1;
+		c.gridy = 0;
+		windowContents.add(organism, c);
+		
+		// THRESHOLD TEXTFIELD
+		c.gridx = 0;
+		c.gridy = 1;
+		windowContents.add(new Label("Enter a Threshold Value (%)"), c);
+		c.gridx = 1;
+		c.gridy = 1;
+		thresholdValue = new JTextField("90", 5);
+		windowContents.add(thresholdValue, c);
+		
+		// SUBMIT BUTTON
+		c.gridx = 0;
+		c.gridy = 2;
+		c.gridwidth = 2;
+		c.anchor=GridBagConstraints.CENTER;
+		submit = new JButton("Submit");
+		windowContents.add(submit, c);
+		submit.addActionListener(this);
+		
+		//add controls area layout to MYGUI JPanel
+		this.add(windowContents, BorderLayout.SOUTH);
+	}
+	
+	
+	
+	
+	
+	// ACTION LISTENER CARRYS OUT ACTIONS WHEN A BUTTON IS PRESSED....
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
+	// MAIN METHOD
+	public static void main (String [] args){
+		try {
+			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+		} catch (ClassNotFoundException | InstantiationException
+				| IllegalAccessException | UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
+		
+		//indicate to java to call createAndShowGUI "asynchronously" => "later"
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run(){
+				createAndShowGUI();
+			}
+		});
+	}
+	
+	private static void createAndShowGUI(){		//create and set up GUI window
+		//JFrame is the outer container for the GUI
+		JFrame frame = new JFrame("DyNAmic Primer Generator");		//sets window name
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	//window closes when X button pressed on rame
+		
+		//create and set up the content pane ass
+		JComponent newContentPane = new GuiPrototype();
+		//make content pane opaque
+		newContentPane.setOpaque(true);
+		//set panel inside the frame
+		frame.setContentPane(newContentPane);
+		
+		//display GUI window
+		frame.pack();
+		frame.setVisible(true);
+	}
+
+}
