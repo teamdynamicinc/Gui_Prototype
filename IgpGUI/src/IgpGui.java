@@ -6,6 +6,7 @@ import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
@@ -18,6 +19,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -37,7 +39,10 @@ public class IgpGui extends JPanel implements ActionListener {
 	JRadioButton localBlastY;		//local blast radio buttons (yes/no)
 	JRadioButton localBlastN;
 	JButton submit;					//submission button
-
+	JFileChooser chooseFile;		//file chooser for multiplex
+	JButton chooseButton;
+	JTextField chosenFile;			//displays path of chosen file
+	
 	private static final long serialVersionUID = -420254383943138649L;
 	
 	public IgpGui() throws ClassNotFoundException {			//default constructor for the GUI
@@ -157,11 +162,30 @@ public class IgpGui extends JPanel implements ActionListener {
 		windowContents.add(localBlastN, c);	//human filter no button (2, 3)
 		
 		
+		//////////////////////////
+		//MULTIPLEX FILE CHOOSER//
+		//////////////////////////
+		c.gridx = 0;
+		c.gridy	= 5;
+		windowContents.add(new Label("Upload a file for multiplex"), c);		//file chooser label (0, 5)
+		c.gridy = 6;
+		c.fill = GridBagConstraints.BOTH;
+		chooseFile = new JFileChooser();
+		chooseFile.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);	//set file chooser to look at files and directories
+		chooseButton = new JButton("Browse");
+		chooseButton.addActionListener(this);
+		chooseButton.setActionCommand("browse");
+		windowContents.add(chooseButton, c);									//file chooser button (0,6)
+		c.gridx = 1;
+		chosenFile = new JTextField(30);
+		windowContents.add(chosenFile, c);										//chosen file text field (1, 6)
+		
+		
 		//////////////////
 		// SUBMIT BUTTON//
 		//////////////////
 		c.gridx = 0;
-		c.gridy = 5;
+		c.gridy = 7;
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor=GridBagConstraints.CENTER;
 		submit = new JButton("Submit");
@@ -173,8 +197,8 @@ public class IgpGui extends JPanel implements ActionListener {
 		this.add(windowContents, BorderLayout.SOUTH);
 	}
 	
-	
-	
+
+		
 	
 	////////////////////////////////////////////////////////////////////////////////////////
 	// ACTION LISTENER CARRYS OUT ACTIONS WHEN A BUTTON IS PRESSED						//
@@ -183,7 +207,7 @@ public class IgpGui extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 		if (event.getActionCommand() == "submit"){					//when submit button is pressed, an array of strings is generated based on the items selected
 			Process p = null;
-			String[] command = new String[8];						
+			String[] command = new String[9];						
 			command[0] = "perl";									//always set to perl as perl is run
 			command[1] = "test.pl";									//set to the perl script name and/or path
 			command[2] = (String) organism.getSelectedItem();		//set to the organism name chosen from the drop down menu
@@ -200,9 +224,12 @@ public class IgpGui extends JPanel implements ActionListener {
 			} else {
 				command[7] = "n";
 			}
+			command[9] = chosenFile.getText();						//absolute file path if user is "uploading" a file for multiplex analysis
+			
 																	//the arguments for the commands will always appear in the same order
 																	//and will be set to null if the an option is not filled in
-													//thus, in the perl @ARGV, the arguments will always appear in the same order
+																	//thus, in the perl @ARGV, the arguments will always appear in the same order
+			
 			
 			ProcessBuilder runPerlScript = new ProcessBuilder(command);		//commands to be carried out stored in ProcessBuilder class
 			try {
@@ -212,6 +239,13 @@ public class IgpGui extends JPanel implements ActionListener {
 				e.printStackTrace();
 			}
 			
+		} else if (event.getActionCommand() == "browse"){				//if "browse" button is clicked, open up file choosing box
+			int returnVal = chooseFile.showOpenDialog(IgpGui.this);
+			
+			if (returnVal == JFileChooser.APPROVE_OPTION){				//displays file path in chosenFile text field
+				File file = chooseFile.getSelectedFile();
+				chosenFile.setText(file.getAbsolutePath());
+			}
 		}
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
