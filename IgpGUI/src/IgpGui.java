@@ -202,7 +202,7 @@ public class IgpGui extends JPanel implements ActionListener {
 			}
 																	//the arguments for the commands will always appear in the same order
 																	//and will be set to null if the an option is not filled in
-																	//thus, in the perl @ARGV, the arguments will always appear in the same order
+													//thus, in the perl @ARGV, the arguments will always appear in the same order
 			
 			ProcessBuilder runPerlScript = new ProcessBuilder(command);		//commands to be carried out stored in ProcessBuilder class
 			try {
