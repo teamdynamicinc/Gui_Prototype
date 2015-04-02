@@ -211,20 +211,32 @@ public class IgpGui extends JPanel implements ActionListener {
 			command[0] = "perl";									//always set to perl as perl is run
 			command[1] = "test.pl";									//set to the perl script name and/or path
 			command[2] = (String) organism.getSelectedItem();		//set to the organism name chosen from the drop down menu
-			command[3] = strain.getText();							//set to strain in text field
-			command[4] = geneID.getText();							//set to geneID in text field
-			command[5] = thresholdValue.getText();					//set to threshold value in text field
-			if (humanFilterY.isSelected()) {						//set to y/n depending on choices 
-				command[6] = "y";
+			if (strain.getText() != null){
+				command[3] = strain.getText();							//set to strain in text field, set to "null" if empty
+			}else {
+				command[3] = "null";
+			}
+			if (geneID.getText() != null){
+				command[4] = geneID.getText();							//set to geneID in text field, set to "null" if empty
+			}else {
+				command[4] = "null";
+			}
+			if (thresholdValue.getText() != null)	{
+				command[5] = thresholdValue.getText();					//set to threshold value in text field, set to "0" if empty
+			}else {
+				command[5] = "0";
+			}
+			if (humanFilterY.isSelected()) {						//set to humanY/N depending on choices 
+				command[6] = "humanY";
 			} else {
-				command[6] = "n";
+				command[6] = "humanN";
 			}
 			if (localBlastY.isSelected()){							//set to y/n depending on choices
-				command[7] = "y";
+				command[7] = "localY";
 			} else {
-				command[7] = "n";
+				command[7] = "localN";
 			}
-			command[9] = chosenFile.getText();						//absolute file path if user is "uploading" a file for multiplex analysis
+			command[8] = "'" + chosenFile.getText() + "'";						//absolute file path if user is "uploading" a file for multiplex analysis
 			
 																	//the arguments for the commands will always appear in the same order
 																	//and will be set to null if the an option is not filled in
@@ -239,7 +251,9 @@ public class IgpGui extends JPanel implements ActionListener {
 				e.printStackTrace();
 			}
 			
-		} else if (event.getActionCommand() == "browse"){				//if "browse" button is clicked, open up file choosing box
+		}
+		
+		if (event.getActionCommand() == "browse"){				//if "browse" button is clicked, open up file choosing box
 			int returnVal = chooseFile.showOpenDialog(IgpGui.this);
 			
 			if (returnVal == JFileChooser.APPROVE_OPTION){				//displays file path in chosenFile text field
