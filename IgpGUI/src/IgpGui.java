@@ -23,6 +23,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -46,10 +47,17 @@ public class IgpGui extends JPanel implements ActionListener {
 	private static final long serialVersionUID = -420254383943138649L;
 	
 	public IgpGui() throws ClassNotFoundException {			//default constructor for the GUI
-		JPanel windowContents = new JPanel(new GridBagLayout());
+		JPanel windowContents = new JPanel(new GridBagLayout());		//make a background container to store all tabbed panes
+		JTabbedPane tabbedPane = new JTabbedPane();						//initialize tabbed pane container
 		GridBagConstraints c = new GridBagConstraints();
-		setPreferredSize(new Dimension(800, 600));	
+		setPreferredSize(new Dimension(800, 400));
 		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////*******************************************
+		//									DATA ENTRY TAB													//
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		JPanel tab1Contents = new JPanel(new GridBagLayout());			//create a panel for the tabbed pane of data entry items
+		tabbedPane.add("Tab1", tab1Contents);							//add panel to tabbed pane
+
 		///////////////////////////
 		//ORGANISM DROP DOWN MENU//
 		///////////////////////////
@@ -57,7 +65,7 @@ public class IgpGui extends JPanel implements ActionListener {
 		c.gridx = 0;
 		c.gridy = 0;
 		c.anchor=GridBagConstraints.WEST;
-		windowContents.add(new Label("Select an Organism:  "), c);	//organism drop down menu label (0,0)
+		tab1Contents.add(new Label("Select an Organism:  "), c);	//organism drop down menu label (0,0)
 		organism = new JComboBox<String>();
 		c.gridx = 1;
 		c.gridy = 0;
@@ -95,40 +103,40 @@ public class IgpGui extends JPanel implements ActionListener {
 				e.printStackTrace();
 			}
 		}
-		windowContents.add(organism, c);
+		tab1Contents.add(organism, c);
 		
 		/////////////////////
 		//Strain Text Field//
 		/////////////////////
 		c.gridx = 2;
 		c.gridy = 0;
-		windowContents.add(new Label("and Strain:"), c); //strain text field label (2, 0)
+		tab1Contents.add(new Label("and Strain:"), c); //strain text field label (2, 0)
 		c.gridx = 3;
 		c.gridy = 0;
 		strain = new JTextField(" ", 8);
-		windowContents.add(strain, c);	//strain text field (3,0)
+		tab1Contents.add(strain, c);	//strain text field (3,0)
 		
 		/////////////////////
 		//GeneID Text Field//
 		/////////////////////
 		c.gridx = 2;
 		c.gridy = 1;
-		windowContents.add(new Label("or Gene ID:"), c); //gene id text field label (2,1)
+		tab1Contents.add(new Label("or Gene ID:"), c); //gene id text field label (2,1)
 		c.gridx = 3;
 		c.gridy = 1;
 		geneID = new JTextField(" ", 8);
-		windowContents.add(geneID, c);	//geneID text field (2,2)
+		tab1Contents.add(geneID, c);	//geneID text field (2,2)
 		
 		////////////////////////
 		// THRESHOLD TEXTFIELD//
 		////////////////////////
 		c.gridx = 0;
 		c.gridy = 2;
-		windowContents.add(new Label("Enter a Threshold Value (%)"), c);	//threshold value label (0,2)
+		tab1Contents.add(new Label("Enter a Threshold Value (%)"), c);	//threshold value label (0,2)
 		c.gridx = 1;
 		c.gridy = 2;
 		thresholdValue = new JTextField("90", 8);
-		windowContents.add(thresholdValue, c);			//threshold value text field (1,2)
+		tab1Contents.add(thresholdValue, c);			//threshold value text field (1,2)
 		
 		//////////////////////////////
 		//HUMAN FILTER RADIO BUTTONS//    //CHANGE TO CHECKBOX
@@ -140,11 +148,11 @@ public class IgpGui extends JPanel implements ActionListener {
 		humanFilter.add(humanFilterN);
 		c.gridx = 0;
 		c.gridy = 3;
-		windowContents.add(new Label ("Filter with human genome?"), c); //Human filter radio buttons label (0,3)
+		tab1Contents.add(new Label ("Filter with human genome?"), c); //Human filter radio buttons label (0,3)
 		c.gridx = 1;
-		windowContents.add(humanFilterY, c);	//human filter yes button (1,3)
+		tab1Contents.add(humanFilterY, c);	//human filter yes button (1,3)
 		c.gridx = 2;
-		windowContents.add(humanFilterN, c);	//human filter no button (2, 3)
+		tab1Contents.add(humanFilterN, c);	//human filter no button (2, 3)
 		
 		
 		//RUN LOCAL BLAST  // CHECK FOR PRIMER DIMERS CHECKBOX
@@ -155,11 +163,11 @@ public class IgpGui extends JPanel implements ActionListener {
 		localBlast.add(localBlastN);
 		c.gridx = 0;
 		c.gridy = 4;
-		windowContents.add(new Label ("Run local BLAST against primers?"), c); //Human filter radio buttons label (0,3)
+		tab1Contents.add(new Label ("Run local BLAST against primers?"), c); //Human filter radio buttons label (0,3)
 		c.gridx = 1;
-		windowContents.add(localBlastY, c);	//human filter yes button (1,3)
+		tab1Contents.add(localBlastY, c);	//human filter yes button (1,3)
 		c.gridx = 2;
-		windowContents.add(localBlastN, c);	//human filter no button (2, 3)
+		tab1Contents.add(localBlastN, c);	//human filter no button (2, 3)
 		
 		
 		//////////////////////////
@@ -167,7 +175,7 @@ public class IgpGui extends JPanel implements ActionListener {
 		//////////////////////////
 		c.gridx = 0;
 		c.gridy	= 5;
-		windowContents.add(new Label("Upload a file for multiplex"), c);		//file chooser label (0, 5)
+		tab1Contents.add(new Label("Upload a file for multiplex"), c);		//file chooser label (0, 5)
 		c.gridy = 6;
 		c.fill = GridBagConstraints.BOTH;
 		chooseFile = new JFileChooser();
@@ -175,10 +183,10 @@ public class IgpGui extends JPanel implements ActionListener {
 		chooseButton = new JButton("Browse");
 		chooseButton.addActionListener(this);
 		chooseButton.setActionCommand("browse");
-		windowContents.add(chooseButton, c);									//file chooser button (0,6)
+		tab1Contents.add(chooseButton, c);									//file chooser button (0,6)
 		c.gridx = 1;
 		chosenFile = new JTextField(30);
-		windowContents.add(chosenFile, c);										//chosen file text field (1, 6)
+		tab1Contents.add(chosenFile, c);										//chosen file text field (1, 6)
 		
 		
 		//////////////////
@@ -189,20 +197,25 @@ public class IgpGui extends JPanel implements ActionListener {
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor=GridBagConstraints.CENTER;
 		submit = new JButton("Submit");
-		windowContents.add(submit, c);
+		tab1Contents.add(submit, c);
 		submit.addActionListener(this);
 		submit.setActionCommand("submit");
-		
-		//add controls area layout to MYGUI JPanel
-		this.add(windowContents, BorderLayout.SOUTH);
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////******************************************************************
+	//												DATABASE VIEWING TAB											//
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	JPanel tab2Contents = new JPanel(new GridBagLayout());
+	tabbedPane.add("Tab2", tab2Contents);		
+	
+	windowContents.add(tabbedPane);									//add tabbed pane to the windowContents container
+	
+	//add controls area layout to MYGUI JPanel
+	this.add(windowContents, BorderLayout.SOUTH);
 	}
 	
-
-		
-	
-	////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////
 	// ACTION LISTENER CARRYS OUT ACTIONS WHEN A BUTTON IS PRESSED						//
-	////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (event.getActionCommand() == "submit"){					//when submit button is pressed, an array of strings is generated based on the items selected
@@ -211,33 +224,38 @@ public class IgpGui extends JPanel implements ActionListener {
 			command[0] = "perl";									//always set to perl as perl is run
 			command[1] = "test.pl";									//set to the perl script name and/or path
 			command[2] = (String) organism.getSelectedItem();		//set to the organism name chosen from the drop down menu
+			
 			if (strain.getText() != null){
 				command[3] = strain.getText();							//set to strain in text field, set to "null" if empty
 			}else {
 				command[3] = "null";
 			}
+			
 			if (geneID.getText() != null){
 				command[4] = geneID.getText();							//set to geneID in text field, set to "null" if empty
 			}else {
 				command[4] = "null";
 			}
+			
 			if (thresholdValue.getText() != null)	{
 				command[5] = thresholdValue.getText();					//set to threshold value in text field, set to "0" if empty
 			}else {
 				command[5] = "0";
 			}
+			
 			if (humanFilterY.isSelected()) {						//set to humanY/N depending on choices 
 				command[6] = "humanY";
 			} else {
 				command[6] = "humanN";
 			}
+			
 			if (localBlastY.isSelected()){							//set to y/n depending on choices
 				command[7] = "localY";
 			} else {
 				command[7] = "localN";
 			}
 			command[8] = "'" + chosenFile.getText() + "'";						//absolute file path if user is "uploading" a file for multiplex analysis
-			
+			command[8] = command[8].replace(" ", "_");							//replace spaces with underscores
 																	//the arguments for the commands will always appear in the same order
 																	//and will be set to null if the an option is not filled in
 																	//thus, in the perl @ARGV, the arguments will always appear in the same order
