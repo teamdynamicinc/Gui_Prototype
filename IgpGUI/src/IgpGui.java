@@ -113,7 +113,7 @@ public class IgpGui extends JPanel implements ActionListener {
 		tab1Contents.add(new Label("and Strain:"), c); //strain text field label (2, 0)
 		c.gridx = 3;
 		c.gridy = 0;
-		strain = new JTextField(" ", 8);
+		strain = new JTextField("", 8);
 		tab1Contents.add(strain, c);	//strain text field (3,0)
 		
 		/////////////////////
@@ -124,7 +124,7 @@ public class IgpGui extends JPanel implements ActionListener {
 		tab1Contents.add(new Label("or Gene ID:"), c); //gene id text field label (2,1)
 		c.gridx = 3;
 		c.gridy = 1;
-		geneID = new JTextField(" ", 8);
+		geneID = new JTextField("", 8);
 		tab1Contents.add(geneID, c);	//geneID text field (2,2)
 		
 		////////////////////////
@@ -222,25 +222,25 @@ public class IgpGui extends JPanel implements ActionListener {
 			Process p = null;
 			String[] command = new String[9];						
 			command[0] = "perl";									//always set to perl as perl is run
-			command[1] = "test.pl";									//set to the perl script name and/or path
+			command[1] = "C:/Users/Rebecca/Desktop/test.pl";		//set to the perl script name and/or path
 			command[2] = (String) organism.getSelectedItem();		//set to the organism name chosen from the drop down menu
 			
-			if (strain.getText() != null){
-				command[3] = strain.getText();							//set to strain in text field, set to "null" if empty
+			if (strain.getText().equals("")){
+				command[3] = "null";							//set to strain in text field, set to "null" if empty
 			}else {
-				command[3] = "null";
+				command[3] = strain.getText();
 			}
 			
-			if (geneID.getText() != null){
-				command[4] = geneID.getText();							//set to geneID in text field, set to "null" if empty
+			if (geneID.getText().equals("")){
+				command[4] = "null";							//set to geneID in text field, set to "null" if empty
 			}else {
-				command[4] = "null";
+				command[4] = geneID.getText();
 			}
 			
-			if (thresholdValue.getText() != null)	{
-				command[5] = thresholdValue.getText();					//set to threshold value in text field, set to "0" if empty
+			if (thresholdValue.getText().equals(""))	{
+				command[5] = "0";					//set to threshold value in text field, set to "0" if empty
 			}else {
-				command[5] = "0";
+				command[5] = thresholdValue.getText();
 			}
 			
 			if (humanFilterY.isSelected()) {						//set to humanY/N depending on choices 
@@ -260,7 +260,9 @@ public class IgpGui extends JPanel implements ActionListener {
 																	//and will be set to null if the an option is not filled in
 																	//thus, in the perl @ARGV, the arguments will always appear in the same order
 			
-			
+			for (int i = 0; i < 9; i++) {
+				System.out.println(command[i]);
+			}
 			ProcessBuilder runPerlScript = new ProcessBuilder(command);		//commands to be carried out stored in ProcessBuilder class
 			try {
 				p = runPerlScript.start();						//execute the command
