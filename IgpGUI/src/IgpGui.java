@@ -21,6 +21,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
@@ -28,6 +29,11 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+/*TODO: -error boxes if spaces are detected in text boxes
+ * 		-database viewer on 2nd tab
+ * 		-check if strain and geneID entry exists in the database --> hook up to view or something
+ * 				-THREE WAYS TO GET FASTA FILE: 1 organism name + 1 strain, 1 gene ID OR 1 upload 
+ */
 
 public class IgpGui extends JTabbedPane implements ActionListener {
 	
@@ -232,9 +238,16 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 				command[4] = geneID.getText();
 			}
 			
+			
 			if (thresholdValue.getText().equals(""))	{
-				command[5] = "0";					//set to threshold value in text field, set to "0" if empty
-			}else {
+				JOptionPane.showMessageDialog(null, "Error! Threshold value not entered!", "Error", JOptionPane.ERROR_MESSAGE);
+			} else {
+				//check if threshold box only contains numbers and is between 0-100, add threshold value to command if all conditions pass
+				if (thresholdValue.getText().matches("[^0-9]")){		
+					JOptionPane.showMessageDialog(null, "Error! Threshold value must be numeric.", "Error", JOptionPane.ERROR_MESSAGE);
+				} else if (Float.valueOf(thresholdValue.getText()) < 0 || Float.valueOf(thresholdValue.getText()) > 100){
+					JOptionPane.showMessageDialog(null, "Error! Threshold value must be between 0 and 100.", "Error", JOptionPane.ERROR_MESSAGE);
+				}
 				command[5] = thresholdValue.getText();
 			}
 			
@@ -325,8 +338,9 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 			
 			//if no fasta file is found from any of those 3 options
 			if (fastaFileName.equals("")) {
-				//produce an error
-				System.out.println("ERROR! No fasta file selected");
+				//produce an error dialog
+				JOptionPane.showMessageDialog(null, "ERROR! No fasta file selected.", "Error", JOptionPane.ERROR_MESSAGE);
+				//System.out.println("ERROR! No fasta file selected");
 			} else {
 				System.out.println("SUCCESS! Fasta file selected: " + fastaFileName);
 			}
