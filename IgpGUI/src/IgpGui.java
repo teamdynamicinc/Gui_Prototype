@@ -29,7 +29,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 
-public class IgpGui extends JPanel implements ActionListener {
+public class IgpGui extends JTabbedPane implements ActionListener {
 	
 	JComboBox<String> organism;		//drop down box containing organism names
 	JTextField strain;				//text field for user to enter a strain
@@ -47,8 +47,6 @@ public class IgpGui extends JPanel implements ActionListener {
 	private static final long serialVersionUID = -420254383943138649L;
 	
 	public IgpGui() throws ClassNotFoundException {			//default constructor for the GUI
-		JPanel windowContents = new JPanel(new GridBagLayout());		//make a background container to store all tabbed panes
-		JTabbedPane tabbedPane = new JTabbedPane();						//initialize tabbed pane container
 		GridBagConstraints c = new GridBagConstraints();
 		setPreferredSize(new Dimension(800, 400));
 		
@@ -56,7 +54,7 @@ public class IgpGui extends JPanel implements ActionListener {
 		//									DATA ENTRY TAB													//
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
 		JPanel tab1Contents = new JPanel(new GridBagLayout());			//create a panel for the tabbed pane of data entry items
-		tabbedPane.add("Tab1", tab1Contents);							//add panel to tabbed pane
+		this.add("Tab1", tab1Contents);							//add panel to tabbed pane
 
 		///////////////////////////
 		//ORGANISM DROP DOWN MENU//
@@ -205,12 +203,8 @@ public class IgpGui extends JPanel implements ActionListener {
 	//												DATABASE VIEWING TAB											//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	JPanel tab2Contents = new JPanel(new GridBagLayout());
-	tabbedPane.add("Tab2", tab2Contents);		
+	this.add("Tab2", tab2Contents);		
 	
-	windowContents.add(tabbedPane);									//add tabbed pane to the windowContents container
-	
-	//add controls area layout to MYGUI JPanel
-	this.add(windowContents, BorderLayout.SOUTH);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -220,6 +214,7 @@ public class IgpGui extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 		if (event.getActionCommand() == "submit"){					//when submit button is pressed, an array of strings is generated based on the items selected
 			Process p = null;
+			String fastaFileName = "";
 			String[] command = new String[9];						
 			command[0] = "perl";									//always set to perl as perl is run
 			command[1] = "C:/Users/Rebecca/Desktop/test.pl";		//set to the perl script name and/or path
@@ -260,9 +255,82 @@ public class IgpGui extends JPanel implements ActionListener {
 																	//and will be set to null if the an option is not filled in
 																	//thus, in the perl @ARGV, the arguments will always appear in the same order
 			
-			for (int i = 0; i < 9; i++) {
-				System.out.println(command[i]);
+			//////////////////////////////////////////////////////////////////////////////////////
+			// ERROR HANDLING FOR USER INPUT													//
+			//////////////////////////////////////////////////////////////////////////////////////
+			//FOLLOWING TESTS TO MAKE SURE FASTA FILE IS SELECTED FOR PROCESSING
+			//if the user has selected a fasta file to upload, make that the fasta file
+			if (!chosenFile.getText().equals("")) {
+				fastaFileName = chosenFile.getText();
+			//if the user has not selected a fasta file to upload, test if values entered are within database
+			} else {
+				//connect to database
+				try {
+					Class.forName("com.mysql.jdbc.Driver");
+				} catch (ClassNotFoundException e1) {
+					e1.printStackTrace();
+				} 
+				//use class loader for database connections
+				String username = "bif712_143a03";		//username
+				String pw = "qhBQ5335";					//pw
+				String dbURL = "jdbc:mysql://zenit.senecac.on.ca/bif712_143a03"; //database url
+				Connection conn = null;
+				Statement stmt = null;
+				//statements for the two user inputted options to retrieve fasta file from database
+				String retrieveFiles1 = "SELECT ORGANISM_GENE.gene_sequence FROM ORGANISM_GENE WHERE ORGANISM_GENE.organism_name = '" + command[2] + "' AND ORGANISM_GENE.strain = '" + command[3] + "'";	
+				String retrieveFiles2 = "SELECT ORGANISM_GENE.gene_sequence FROM ORGANISM_GENE WHERE ORGANISM_GENE.gene_id = '" + command[4] + "'";
+				System.out.println("attempting to connect to database: " + dbURL + "with usr: "+ username + " and pw: " + "pw");
+				try {
+					conn = DriverManager.getConnection(dbURL, username, pw);
+					System.out.println("successful connection to database");
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				
+				//run statement query
+				try {
+					stmt = conn.createStatement();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				
+				if (stmt != null){
+					//if a strain is entered, use strain AND organism name to find fasta file
+					if (!strain.getText().equals("")) {
+						try {
+							ResultSet records = stmt.executeQuery(retrieveFiles1);
+							while (records.next()){						
+								//if records found under that organism name/strain combination, use fasta file from that row
+								//if more than one record found with that combination, use the last record
+								fastaFileName = (records.getString("gene_sequence"));
+							}
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+						
+					//if a gene ID is entered, use just that value to find fasta file	
+					} else if (!geneID.getText().equals("")) {
+						try {
+							ResultSet records = stmt.executeQuery(retrieveFiles2);
+							while (records.next()){							
+								//if records found under that gene ID, use fasta file from that row
+								fastaFileName = (records.getString("gene_sequence"));
+							}
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+					}
+				}
 			}
+			
+			//if no fasta file is found from any of those 3 options
+			if (fastaFileName.equals("")) {
+				//produce an error
+				System.out.println("ERROR! No fasta file selected");
+			} else {
+				System.out.println("SUCCESS! Fasta file selected: " + fastaFileName);
+			}
+			
 			ProcessBuilder runPerlScript = new ProcessBuilder(command);		//commands to be carried out stored in ProcessBuilder class
 			try {
 				p = runPerlScript.start();						//execute the command
