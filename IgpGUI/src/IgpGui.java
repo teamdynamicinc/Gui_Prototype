@@ -1,31 +1,16 @@
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Label;
-import java.awt.event.ActionEvent;
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Vector;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -39,7 +24,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -525,7 +509,6 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 		
 		if (event.getActionCommand() == "tableSelect"){
 			String getTable = "SELECT * FROM " + dbTable.getSelectedItem() + ";";
-			ArrayList<ArrayList<Object>> data = new ArrayList<ArrayList<Object>>();
 			
 			if (stmt != null){
 				try {
@@ -533,7 +516,6 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 					
 					ResultSetMetaData metaData = (ResultSetMetaData) records.getMetaData(); //get meta data to find column names
 					int numColumns = metaData.getColumnCount();	//get number of columns to use in for loop for retrieving column names
-					Vector<String> columns = new Vector<String>(numColumns);	//initialize vector to store column names
 					
 					// CREATE A TABLE MODEL WITH THE DATABASE DATA WITHIN IT (by: IAndreev93 source: http://www.codeproject.com/Tips/882355/Java-and-MySQL-via-JDBC-How-to-Connect-DB-Get-Data)
 					//for changing column and row model
