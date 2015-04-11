@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
@@ -42,6 +43,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.table.DefaultTableModel;
+
+import com.mysql.jdbc.ResultSetMetaData;
 /*TODO: -error boxes if spaces are detected in text boxes
  * 		-database viewer on 2nd tab
  * 		-THREE WAYS TO GET FASTA FILE: 1 organism name + 1 strain, 1 gene ID OR 1 upload 
@@ -520,36 +524,49 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 		}
 		
 		if (event.getActionCommand() == "tableSelect"){
-			String getColumns = "SHOW COLUMNS FROM " + dbTable.getSelectedItem() + ";";
 			String getTable = "SELECT * FROM " + dbTable.getSelectedItem() + ";";
-			Vector<String> columnNames = new Vector<String>();
-			Vector<String> tableRow = new Vector<String>();
-			
+			ArrayList<ArrayList<Object>> data = new ArrayList<ArrayList<Object>>();
 			
 			if (stmt != null){
-				//get column names from table as headers
 				try {
-					ResultSet records = stmt.executeQuery(getColumns);
-					while (records.next()){
-						columnNames.addElement(records.getString("Field"));
-					}
+					ResultSet records = stmt.executeQuery(getTable); //execute getTable query
+					
+					ResultSetMetaData metaData = (ResultSetMetaData) records.getMetaData(); //get meta data to find column names
+					int numColumns = metaData.getColumnCount();	//get number of columns to use in for loop for retrieving column names
+					Vector<String> columns = new Vector<String>(numColumns);	//initialize vector to store column names
+					
+					// CREATE A TABLE MODEL WITH THE DATABASE DATA WITHIN IT (by: IAndreev93 source: http://www.codeproject.com/Tips/882355/Java-and-MySQL-via-JDBC-How-to-Connect-DB-Get-Data)
+					//for changing column and row model
+				    DefaultTableModel tm = (DefaultTableModel) tableDisplay.getModel();
+				    
+				    //clear existing columns 
+				    tm.setColumnCount(0);
+
+				    //add columns to the table model
+				    for (int i = 1; i <= numColumns; i++ ) {
+				        tm.addColumn(metaData.getColumnName(i));
+				    }   
+
+				    // clear existing rows
+				    tm.setRowCount(0);
+
+				    // add rows to table
+				    while (records.next()) {
+				        String[] a = new String[numColumns];
+				        for(int i = 0; i < numColumns; i++) {
+				            a[i] = records.getString(i+1);
+				        }
+				    tm.addRow(a);
+				    }
+				    tm.fireTableDataChanged();
+
+				    // Close ResultSet and Statement
+				    records.close();
+				    stmt.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
-				
-				
-				//get table values 
-//				try {
-//					ResultSet records = stmt.executeQuery(getTable);
-//					int $i = 0;
-//					while (records.next()){
-//						
-//					}
-//				} catch (SQLException e) {
-//					e.printStackTrace();
-//				}
 			}
-		
 		}
 	}
 	
