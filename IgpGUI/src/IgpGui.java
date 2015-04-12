@@ -32,7 +32,7 @@ import javax.swing.table.DefaultTableModel;
 import com.mysql.jdbc.ResultSetMetaData;
 /*TODO: 
  * 		IMPLEMENT CSV CONVERSION TO TABLE IN TAB3
- * 			-have to resize the jscrolltable window
+ * 			-have to resize the jscrolltable window, and figure out why text field disappears when it is added
  * 		IMPLEMENT VIEWER TO TAB 4
  *
  */
@@ -318,18 +318,20 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 		
 		//Chosen file text field
 		tab3Constraints.gridx = 1;
+//		tab3Constraints.gridwidth = 3;
 		chosenResultFile = new JTextField(30);
 		tab3Contents.add(chosenResultFile, tab3Constraints);
 		
 		//Result file submit button
-		tab3Constraints.gridx = 2;
+		tab3Constraints.gridx = 4;
+//		tab3Constraints.gridwidth = 1;
 		resultSubmit = new JButton("Submit");
 		resultSubmit.addActionListener(this);
 		resultSubmit.setActionCommand("submitResultFile");
 		tab3Contents.add(resultSubmit, tab3Constraints);
 		
 		//Latest Generated File Button
-		tab3Constraints.gridx = 3;
+		tab3Constraints.gridx = 5;
 		mostRecentSubmit = new JButton("Use Latest Generated File");
 		mostRecentSubmit.addActionListener(this);
 		mostRecentSubmit.setActionCommand("submitResultFile");
@@ -338,9 +340,12 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 		//results table and scrollpane 
 //		tab3Constraints.gridx = 0;
 //		tab3Constraints.gridy = 1;
+//		tab3Constraints.gridwidth = 6;
+//		tab3Constraints.weighty = 1;
+//		tab3Constraints.weightx = 2;
 //		resultDisplay = new JTable();
 //		JScrollPane resultScroller = new JScrollPane(resultDisplay);
-//		tab3Contents.add(resultScroller, tab2Constraints);
+//		tab3Contents.add(resultScroller, tab3Constraints);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
