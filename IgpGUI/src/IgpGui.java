@@ -336,7 +336,7 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 		
 		//LATEST GENERATED FILE BUTTON
 		tab3Constraints.gridx = 5;
-		mostRecentSubmit = new JButton("Use Latest Generated File");
+		mostRecentSubmit = new JButton("Use Last Modified File");
 		mostRecentSubmit.addActionListener(this);
 		mostRecentSubmit.setActionCommand("submitResultFileMostRecent");
 		tab3Contents.add(mostRecentSubmit, tab3Constraints);
@@ -348,6 +348,9 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 		tab3Constraints.weighty = 1;
 		tab3Constraints.weightx = 2;
 		resultDisplay = new JTable();
+		resultDisplay.setRowSelectionAllowed(true);
+		resultDisplay.setColumnSelectionAllowed(true);
+		resultDisplay.setCellSelectionEnabled(true);
 		JScrollPane resultScroller = new JScrollPane(resultDisplay);
 		tab3Contents.add(resultScroller, tab3Constraints);
 	}
@@ -394,7 +397,7 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 //			String fastaFileName = "";
 //			String[] command = new String[10];						
 //			command[0] = "perl";									//always set to perl as perl is run
-//			command[1] = "C:/Users/Rebecca/Desktop/IGP/PERL_PROGRAM/primer3plus_v1.6.pl";					//set to the perl script name and/or path
+//			command[1] = "C:/Users/Tiffany/Desktop/Project/primer3plus_v1.9.pl";					//set to the perl script name and/or path
 //			command[2] = (String) organism.getSelectedItem();		//set to the organism name chosen from the drop down menu
 //			command[2] = command[2].replace(" ", "_");
 //			
@@ -671,7 +674,46 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 			    }
 				
 				String[] rowData;
-		    	while ((rowData = reader.readNext()) != null){ //checks if line is empty
+		    	while ((rowData = reader.readNext()) != null){ //checks if line is empty and adds the row to the table model
+		    		tm.addRow(rowData);
+		    	}
+				reader.close();
+			} catch (java.io.IOException e) {
+				System.out.print("Error while reading\n");
+			}
+	        tm.fireTableDataChanged();
+		}
+		
+		//MOST RECENT FILE SUBMIT BUTTON EVENT
+		if (event.getActionCommand() == "submitResultFileMostRecent"){ 
+			File lastModifiedFile = getLatestFileFromDir("output");
+			
+			//get total number of rows in csv file
+	    	BufferedReader bufferedReader = null;
+			try {
+				bufferedReader = new BufferedReader(new FileReader(lastModifiedFile));
+			} catch (FileNotFoundException e3) {
+				e3.printStackTrace();
+			}
+			
+			//for changing column and row model
+		    DefaultTableModel tm = (DefaultTableModel) resultDisplay.getModel();
+			
+		    //clear existing columns
+		    tm.setColumnCount(0);
+		    tm.setRowCount(0);
+	        
+	        //reading csv file with CSVReader
+	        try {
+				reader = new CSVReader(new FileReader(lastModifiedFile));
+				columnNames = reader.readNext();	// first line = column names
+				//add the columns to the table model
+				for (int i = 0; i < columnNames.length; i++ ) {
+			        tm.addColumn(columnNames[i]);
+			    }
+				
+				String[] rowData;
+		    	while ((rowData = reader.readNext()) != null){ //checks if line is empty and adds the row to the table model
 		    		tm.addRow(rowData);
 		    	}
 				reader.close();
@@ -725,6 +767,29 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 		//display GUI window
 		frame.pack();
 		frame.setVisible(true);
+	}
+	
+	//METHOD FOR OBTAINING THE LATEST FILE FROM A DIRECTORY (by : Bozho, source: http://stackoverflow.com/questions/2064694/how-do-i-find-the-last-modified-file-in-a-directory-in-java)
+	private File getLatestFileFromDir(String dirPath){
+	    File dir = new File(dirPath);
+	    File[] files = dir.listFiles();
+	    if (files == null || files.length == 0) {
+	        return null;
+	    }
+
+	    File lastModifiedFile = files[0];
+	    for (int i = 1; i < files.length; i++) {
+	       if (lastModifiedFile.lastModified() < files[i].lastModified()) {
+	           lastModifiedFile = files[i];
+	       }
+	    }
+	    
+	    //error handling if last modified file in output folder is not a .csv file
+	    if(!lastModifiedFile.toString().matches(".+(.csv)")){
+			JOptionPane.showMessageDialog(null, "Last modified file is not a .csv file", "Error", JOptionPane.ERROR_MESSAGE);
+    	}
+	    
+	    return lastModifiedFile;
 	}
 
 }
