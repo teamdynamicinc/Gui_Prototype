@@ -345,8 +345,8 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 		tab3Constraints.gridx = 0;
 		tab3Constraints.gridy = 1;
 		tab3Constraints.gridwidth = 6;
-//		tab3Constraints.weighty = 1;
-//		tab3Constraints.weightx = 2;
+		tab3Constraints.weighty = 1;
+		tab3Constraints.weightx = 2;
 		resultDisplay = new JTable();
 		JScrollPane resultScroller = new JScrollPane(resultDisplay);
 		tab3Contents.add(resultScroller, tab3Constraints);
@@ -653,7 +653,13 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 				e3.printStackTrace();
 			}
 			
-	        String input;
+			//for changing column and row model
+		    DefaultTableModel tm = (DefaultTableModel) resultDisplay.getModel();
+			
+		    //clear existing columns
+		    tm.setColumnCount(0);
+	       
+		    String input;
 	        int count = 0;
 	        try {
 				while((input = bufferedReader.readLine()) != null){
@@ -672,34 +678,20 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 	        try {
 				reader = new CSVReader(new FileReader(chosenFile));
 				columnNames = reader.readNext();	// first line = column names
-		    	while ((line = reader.readNext())!=null){ //checks if line is empty
-					row = new Object[line.length];
-		        	// convert strings to int or double when possible
-					for (int i = 0; i < line.length; i++) {
-						try {
-							row[i] = Integer.valueOf(line[i]);
-						} catch (NumberFormatException e1) {
-							try {
-								row[i] = Double.valueOf(line[i]);
-							} catch (NumberFormatException e2) {
-								row[i] = line [i];
-							}
-						}
-					}
-					data[nRows++] = row;
+				//add the columns to the table model
+				for (int i = 0; i < columnNames.length; i++ ) {
+			        tm.addColumn(columnNames[i]);
+			    }
+				
+				String[] rowData;
+		    	while ((rowData = reader.readNext()) != null){ //checks if line is empty
+		    		tm.addRow(rowData);
 		    	}
 				reader.close();
 			} catch (java.io.IOException e) {
 				System.out.print("Error while reading\n");
 			}
-	        
-	        // Create table
-	        resultDisplay = new JTable(data, columnNames);
-
-	        //Create the scroll pane and add to Jtable
-	        resultScroller.repaint()
-//	        tab3Contents.add(resultScroller, tab3Constraints);
-
+	        tm.fireTableDataChanged();
 		}
 	}
 		
