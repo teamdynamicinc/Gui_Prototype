@@ -593,6 +593,7 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 //				    
 //				    //clear existing columns 
 //				    tm.setColumnCount(0);
+//					tm.setRowCount(0);
 //
 //				    //add columns to the table model
 //				    for (int i = 1; i <= numColumns; i++ ) {
@@ -658,22 +659,8 @@ public class IgpGui extends JTabbedPane implements ActionListener {
 			
 		    //clear existing columns
 		    tm.setColumnCount(0);
-	       
-		    String input;
-	        int count = 0;
-	        try {
-				while((input = bufferedReader.readLine()) != null){
-				    count++;
-				}
-			} catch (IOException e3) {
-				e3.printStackTrace();
-			}
+		    tm.setRowCount(0);
 	        
-	        //initialize amount of data using count number determined before
-	        Object[][] data = new Object[count-1][];
-	        
-	        //number of rows
-	        int nRows = 0;
 	        //reading csv file with CSVReader
 	        try {
 				reader = new CSVReader(new FileReader(chosenFile));
